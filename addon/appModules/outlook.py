@@ -597,6 +597,30 @@ class AddressBookEntry(RowWithoutCellObjects, RowWithFakeNavigation, outlook.Add
 		ui.message(_('Column navigation not supported in the address book'))
 
 
+class UIAMailTipPane(UIA):
+	def event_NVDAObject_init(self):
+		ui.message('toto')
+	
+class UIAMailTipItemText(UIA):
+	def event_NVDAObject_init(self):
+		ui.message(self.name)
+
+class UIAMailTipItemMessage(UIA):
+	def event_NVDAObject_init(self):
+		from tones import beep
+		beep(440,500)
+		
+	def event_show(self):
+		ui.message(self.name)
+		#speech.speakObject(self, reason=controlTypes.REASON_FOCUS)
+
+class UIARecipientButton(UIA):
+	def _get_name(self):
+		return self.firstChild.name
+		
+	def event_(self):
+		ui.message(self.name)
+
 class AppModule(outlook.AppModule):
 	
 	scriptCategory = ADDON_SUMMARY
@@ -621,9 +645,19 @@ class AppModule(outlook.AppModule):
 			return
 		if outlook.UIAGridRow in clsList:
 			clsList.insert(0, UIAGridRowWithReadStatus)
-		if UIA in clsList and obj.role == controlTypes.ROLE_GROUPING:
-			clsList.insert(0,UIAWithReadStatus)
-		
+			return
+		if UIA in clsList:
+			if obj.role == controlTypes.ROLE_GROUPING and obj.parent.windowClassName == 'OutlookGrid':
+				clsList.insert(0,UIAWithReadStatus)
+			elif obj.role == controlTypes.ROLE_PANE and obj.parent.role == controlTypes.ROLE_GROUPING and obj.windowClassName == 'NetUIHWND':
+				clsList.insert(0, UIAMailTipPane)
+			elif obj.UIAElement.currentAutomationID == 'RecipientButton':
+				clsList.insert(0, UIARecipientButton)
+			elif obj.UIAElement.currentAutomationID == 'MailTipItemText':
+				clsList.insert(0, UIAMailTipItemText)
+			elif obj.UIAElement.currentAutomationID == 'MailTipItemMessage':
+				clsList.insert(0, UIAMailTipItemMessage)
+	
 	def reportHeaderFieldN(self, nField, gesture):
 		if api.getFocusObject().windowClassName in ['DayViewWnd', 'WeekViewWnd']:
 		#Calendar view: Alt+digit is used command to set up number of days in the view
