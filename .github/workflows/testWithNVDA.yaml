@@ -38,7 +38,11 @@ jobs:
         path: "*.nvda-addon"
     - name: Build pot
       run: scons pot
-
+    - name: Upload pot
+      uses: actions/upload-artifact@v2
+      with:
+        name: pot-file
+        path: "*.pot"
 
 
   nvda:
@@ -70,6 +74,15 @@ jobs:
       uses: actions/download-artifact@v2
       with:
         name: nvda-addon
+    - name: Download pot
+      uses: actions/download-artifact@v2
+      with:
+        name: pot-file
+    - name: Check pot
+      run: |
+        move *.pot tests\nvda.pot
+        cd tests
+        python checkPot.py nvda.pot
     - name: Copy add-on
       run: |
         move *.nvda-addon addon.zip
