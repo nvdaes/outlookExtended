@@ -34,13 +34,12 @@ jobs:
       with:
         name: nvda-addon
         path: "*.nvda-addon"
-    - name: Install gettext
+    - name: Build pot
       run: |
         sudo apt update
-        sudo apt install gettext        
-    - name: Build pot
-      run: scons pot
-      
+        sudo apt install gettext
+        scons pot
+
   nvda:
   
     name: NVDA
