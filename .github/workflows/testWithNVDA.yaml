@@ -14,7 +14,7 @@ jobs:
   
     name: addon
 
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
 
     steps:
     - name: Checkout code
@@ -23,28 +23,29 @@ jobs:
       uses: actions/setup-python@v2
       with:
         python-version: 3.7
-        architecture: x86
     - name: Install dependencies
       run: |
         pip install scons
         pip install Markdown
     - name: Build add-on
       run: scons
-      shell: cmd
     - name: Upload add-on
       uses: actions/upload-artifact@v2
       with:
         name: nvda-addon
         path: "*.nvda-addon"
+    - name: Install gettext
+      run: |
+        sudo apt update
+        sudo apt install gettext        
     - name: Build pot
       run: scons pot
-      shell: cmd
-
+      
   nvda:
   
     name: NVDA
   
-    needs: addon
+    needs: pot
   
     runs-on: windows-latest
 
