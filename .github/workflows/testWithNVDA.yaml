@@ -82,7 +82,12 @@ jobs:
       run: |
         move *.pot tests\nvda.pot
         cd tests
-        python checkPot.py nvda.pot
+        python checkPot.py nvda.pot > potResults.txt
+    - name: Upload pot
+      uses: actions/upload-artifact@v2
+      with:
+        name: pot-results
+        path: tests\potResults.txt
     - name: Copy add-on
       run: |
         move *.nvda-addon addon.zip
