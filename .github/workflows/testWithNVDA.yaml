@@ -27,6 +27,8 @@ jobs:
       run: |
         pip install scons
         pip install Markdown
+        sudo apt update
+        sudo apt install gettext
     - name: Build add-on
       run: scons
     - name: Upload add-on
@@ -35,10 +37,9 @@ jobs:
         name: nvda-addon
         path: "*.nvda-addon"
     - name: Build pot
-      run: |
-        sudo apt update
-        sudo apt install gettext
-        scons pot
+      run: scons pot
+
+
 
   nvda:
   
