@@ -82,8 +82,11 @@ jobs:
       run: |
         move *.pot tests\nvda.pot
         cd tests
+        python checkPot.py nvda.pot
         python checkPot.py nvda.pot > potResults.txt
+        If (Select-String -Path potResults.txt -Pattern 'Message has no translator comment' -SimpleMatch) {exit 1}
     - name: Upload pot
+      if: failure()
       uses: actions/upload-artifact@v2
       with:
         name: pot-results
