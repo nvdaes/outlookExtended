@@ -84,13 +84,20 @@ jobs:
         cd tests
         python checkPot.py nvda.pot
         python checkPot.py nvda.pot > potResults.txt
-        If (Select-String -Path potResults.txt -Pattern 'Message has no translator comment' -SimpleMatch) {exit 1}
-    - name: Upload pot
+        # If (Select-String -Path potResults.txt -Pattern 'Message has no translator comment' -SimpleMatch) {exit 1}
+        If (Select-String -Path potResults.txt -Pattern 'hello' -SimpleMatch) {exit 1}
+    - name: Comment on PR
+      uses: actions/github-script@v3
       if: failure()
-      uses: actions/upload-artifact@v2
       with:
-        name: pot-results
-        path: tests\potResults.txt
+        github-token: ${{secrets.GITHUB_TOKEN}}
+        script: |
+          github.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: 'This PR has messages without comments for translators'
+          })
     - name: Copy add-on
       run: |
         move *.nvda-addon addon.zip
