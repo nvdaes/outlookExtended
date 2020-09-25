@@ -45,7 +45,7 @@ jobs:
   
     name: NVDA
   
-    needs: pot
+    needs: addon
   
     runs-on: windows-latest
 
